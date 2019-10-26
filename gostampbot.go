@@ -60,14 +60,14 @@ func loadConfig() {
 	}
 
 	if file != nil {
-		// TODO: Parse and get options from config file
+		// @todo: Parse and get options from config file
 	}
 
 	// override cfg options with cli options
 	twitCKey := flag.String("consumerkey", "", "Twitter API Consumer Key (required)")
 	flag.Parse()
 
-	// TODO: finish checking for config arguments
+	// @todo: finish checking for config arguments
 	// twitCSecret := flag.String("consumersecret", "", "Twitter API Consumer Secret")
 	// twitToken := flag.String("token", "", "Twitter API Token");
 	// twitTokenSecret := flag.String("tokensecret", "", "Twitter API Token Secret")
@@ -92,7 +92,7 @@ func storeOnIPFS(tweet *twitter.Tweet) (string, error) {
 }
 
 func createTwitterClient() *twitter.Client {
-	//TODO: get twitter api client params from config
+	//@todo: get twitter api client params from config
 	config := oauth1.NewConfig("gb6CAlY1LLe3PL8UjFmKeMg0W", "C5Uy9ooeIyupNTFwkro8RIukgWPL4f1cQgONc4Xl0kcpfWBDxD")
 	token := oauth1.NewToken("903809097664954369-nRdvR7RUQ3QN0OE0XC5G6QcYK125its", "SfSdwDC20FMHOEcC2UF199roLS8DXjPe26EQxebrnTQ62")
 	httpClient := config.Client(oauth1.NoContext, token)
@@ -101,7 +101,7 @@ func createTwitterClient() *twitter.Client {
 }
 
 func createIPFSShell() *ipfs.Shell {
-	// TODO: create a config field to hold the ipfs shell host and
+	// @todo: create a config field to hold the ipfs shell host and
 	// replace it
 	return ipfs.NewShell("localhost:5001")
 }
@@ -135,9 +135,9 @@ func main() {
 	}
 
 	listenToTweets(stream, func(tweet *twitter.Tweet) {
-		// TODO: validate tweets with regex pattern
-		// TODO: timestamp tweets
-		// TODO: reply to tweet thread and dm author
+		// @todo: validate tweets with regex pattern
+		// @todo: timestamp tweets
+		// @todo: reply to tweet thread and dm author
 		fmt.Println(tweet.Text)
 		cid, err := storeOnIPFS(tweet)
 		if err != nil {
