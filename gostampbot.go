@@ -31,16 +31,29 @@ func storeOnIPFS(tweet *twitter.Tweet) (string, error) {
 	return cid, nil
 }
 
-func createTwitterClient() *twitter.Client {
+func createTwitterClient() (*twitter.Client, error) {
 	cfg := oauth1.NewConfig(config.TwitAPIConsumerKey, config.TwitAPIConsumerSecret)
 	token := oauth1.NewToken(config.TwitAPIToken, config.TwitAPITokenSecret)
 	httpClient := cfg.Client(oauth1.NoContext, token)
+	client := twitter.NewClient(httpClient)
 
-	return twitter.NewClient(httpClient)
+	// verify credentials
+	params := twitter.AccountVerifyParams{}
+	_, _, err := client.Accounts.VerifyCredentials(&params)
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
 
-func createIPFSShell() *ipfs.Shell {
-	return ipfs.NewShell(config.IPFSHost)
+func createIPFSShell() (*ipfs.Shell, error) {
+	s := ipfs.NewShell(config.IPFSHost)
+	_, _, err := s.Version()
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
 }
 
 func createTwitterStream() (*twitter.Stream, error) {
@@ -69,11 +82,19 @@ func trimWords(words []string) []string {
 func main() {
 
 	config = loadConfig()
-	client = createTwitterClient()
-	shell = createIPFSShell()
+
+	twitClient, err := createTwitterClient()
+	if err != nil {
+		log.Fatalf("Could not create a twitter client: %v", err)
+	}
+	client = twitClient
+
+	shell, err = createIPFSShell()
+	if err != nil {
+		log.Fatalf("Could not connect to IPFS daemon: %v", err)
+	}
 
 	config.TargetWords = trimWords(config.TargetWords)
-
 	stream, err := createTwitterStream()
 	if err != nil {
 		fmt.Println("stream error: ", err)
@@ -92,7 +113,7 @@ func main() {
 			log.Println("ipfs oK", cid)
 		}
 
-		log.Println("\n \n ======", count, " TWEETS ======= \n \n")
+		log.Println("\n \n ======", count, " TWEETS ======= \n ")
 	})
 
 	log.Println(len(config.TargetWords), " tracked words: ", config.TargetWords)
