@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,19 +10,21 @@ import (
 	"strings"
 	"syscall"
 
+	piutil "github.com/decred/politeia/util"
+
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	ipfs "github.com/ipfs/go-ipfs-api"
 )
 
-// IPFS shell
 var shell *ipfs.Shell
 var client *twitter.Client
 var config *Config
+var dcrtimeHost string
 var count int
 
-func storeOnIPFS(tweet *twitter.Tweet) (string, error) {
-	b, err := json.Marshal(tweet)
+func storeOnIPFS(tweetThread []*twitter.Tweet) (string, error) {
+	b, err := json.Marshal(tweetThread)
 	v := string(b)
 	r := strings.NewReader(v)
 	cid, err := shell.Add(r)
@@ -79,6 +82,70 @@ func trimWords(words []string) []string {
 	return processedWords
 }
 
+func getTweetThread(ID int64, thread []*twitter.Tweet) ([]*twitter.Tweet, error) {
+	trimUser := true
+	includeRetweets := false
+	includeEntities := false
+	params := &twitter.StatusShowParams{
+		TrimUser:         &trimUser,
+		IncludeMyRetweet: &includeRetweets,
+		IncludeEntities:  &includeEntities,
+	}
+	tweet, _, err := client.Statuses.Show(ID, params)
+	if err != nil {
+		return nil, err
+	}
+	thread = append(thread, tweet)
+	if tweet.InReplyToStatusID == 0 {
+		return thread, nil
+	}
+	return getTweetThread(tweet.InReplyToStatusID, thread)
+}
+
+func getDcrtimeHost() string {
+	return "https://" + piutil.NormalizeAddress(config.DcrTimeHost, config.DcrTimePort)
+}
+
+func handleTweet(tweet *twitter.Tweet) {
+	// @todo: validate tweets with regex patterns
+	// @todo: reply to tweet thread and dm author
+	tweetThread := []*twitter.Tweet{}
+	count++
+	fmt.Println(tweet.Text)
+
+	tweetThread, err := getTweetThread(tweet.ID, tweetThread)
+
+	if err != nil {
+		log.Println("Cannot process twitter thread!:", err)
+	} else {
+		log.Println("\n Thread size: ", len(tweetThread))
+	}
+
+	// create digest for tweet thread and timestamp it
+	b, err := json.Marshal(tweetThread)
+	digest := piutil.Digest(b)
+	var digests []*[sha256.Size]byte
+	var d [sha256.Size]byte
+	copy(d[:], digest[:sha256.Size])
+	digests = append(digests, &d)
+
+	err = piutil.Timestamp("test", getDcrtimeHost(), digests)
+	if err != nil {
+		log.Println("Could not timestamp", err)
+	} else {
+		log.Println("Timestamp OK")
+	}
+
+	// store the thread using IPFS
+	cid, err := storeOnIPFS(tweetThread)
+	if err != nil {
+		log.Println("ipfs failed: ", err)
+	} else {
+		log.Println("ipfs OK", cid)
+	}
+	log.Println("\n \n ======", count, " TWEETS ======= \n ")
+}
+
 func main() {
 
 	config = loadConfig()
@@ -100,21 +167,7 @@ func main() {
 		fmt.Println("stream error: ", err)
 	}
 
-	listenToTweets(stream, func(tweet *twitter.Tweet) {
-		// @todo: validate tweets with regex pattern
-		// @todo: timestamp tweets
-		// @todo: reply to tweet thread and dm author
-		count++
-		fmt.Println(tweet.Text)
-		cid, err := storeOnIPFS(tweet)
-		if err != nil {
-			log.Println("ipfs failed: ", err)
-		} else {
-			log.Println("ipfs oK", cid)
-		}
-
-		log.Println("\n \n ======", count, " TWEETS ======= \n ")
-	})
+	listenToTweets(stream, handleTweet)
 
 	log.Println(len(config.TargetWords), " tracked words: ", config.TargetWords)
 	log.Println("Start of the day!")
