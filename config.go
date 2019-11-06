@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/decred/dcrd/dcrutil"
+	v1 "github.com/decred/dcrtime/api/v1"
 	flags "github.com/jessevdk/go-flags"
 )
 
@@ -20,6 +21,8 @@ var (
 	defaultConfigFile  = filepath.Join(defaultHomeDir, defaultConfigFilename)
 	defaultTargetWords = []string{}
 	defaultIPFSHost    = "localhost:5001"
+	defaultDcrtimeHost = v1.DefaultMainnetTimeHost
+	defaultDcrtimePort = v1.DefaultMainnetTimePort
 
 	usageMessage string
 )
@@ -33,6 +36,8 @@ type Config struct {
 	TargetWords           []string `short:"t" long:"targetwords" description:"The target words to track"`
 	ConfigFile            string   `short:"c" long:"config" description:"The configuration file to be used"`
 	IPFSHost              string   `long:"ipfshost" description:"The IPFS API host"`
+	DcrTimeHost           string   `long:"dcrtimehost" description:"The dcrtime API host"`
+	DcrTimePort           string   `long:"dcrtimeport" description:"The dcrtime API port"`
 }
 
 func parseCommandLineOptions(cfg *Config) {
@@ -79,6 +84,8 @@ func loadConfig() *Config {
 		ConfigFile:  defaultConfigFile,
 		TargetWords: defaultTargetWords,
 		IPFSHost:    defaultIPFSHost,
+		DcrTimeHost: defaultDcrtimeHost,
+		DcrTimePort: defaultDcrtimePort,
 	}
 
 	// parse command line options to check for a different config file location
