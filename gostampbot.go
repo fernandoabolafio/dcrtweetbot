@@ -212,6 +212,8 @@ func main() {
 	log.Println(len(config.TargetWords), " tracked words: ", config.TargetWords)
 	log.Println("Start of the day!")
 
+	startServer()
+
 	// listen to stop signal and stop the stream before exiting
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
