@@ -25,6 +25,7 @@ type wsConfig struct {
 	WsHost string
 }
 
+//TODO: this method needs an appropriate naming
 func echo(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -44,19 +45,6 @@ func echo(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// for {
-	// 	mt, message, err := c.ReadMessage()
-	// 	if err != nil {
-	// 		log.Println("read:", err)
-	// 		break
-	// 	}
-	// 	log.Printf("recv: %s", message)
-	// 	err = c.WriteMessage(mt, message)
-	// 	if err != nil {
-	// 		log.Println("write:", err)
-	// 		break
-	// 	}
-	// }
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -80,11 +68,3 @@ func startServer() {
 	http.HandleFunc("/", home)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
-
-// func main() {
-// 	flag.Parse()
-// 	log.SetFlags(0)
-// 	http.HandleFunc("/echo", echo)
-// 	http.HandleFunc("/", home)
-// 	log.Fatal(http.ListenAndServe(*addr, nil))
-// }
