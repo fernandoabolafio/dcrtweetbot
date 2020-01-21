@@ -12,11 +12,11 @@ import (
 )
 
 const (
-	defaultConfigFilename = "gostampbot.conf"
+	defaultConfigFilename = "dcrtweetbot.conf"
 )
 
 var (
-	defaultHomeDir = dcrutil.AppDataDir("gostampbot", false)
+	defaultHomeDir = dcrutil.AppDataDir("dcrtweetbot", false)
 
 	defaultConfigFile  = filepath.Join(defaultHomeDir, defaultConfigFilename)
 	defaultTargetWords = []string{}

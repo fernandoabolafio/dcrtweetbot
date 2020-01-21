@@ -115,13 +115,18 @@ func getDcrtimeHost() string {
 	return "https://" + piutil.NormalizeAddress(config.DcrTimeHost, config.DcrTimePort)
 }
 
+// handleTweet will receive a Tweet as the single input, fetch all the tweet
+// thread (e.g the parent tweets in the thread, if any). Then it will make
+// the necessary transformations to timestamp it in the Decred network and
+// store on IPFS. The result details are sent in a different channel which
+// will handle the results procedure.
 func handleTweet(tweet *twitter.Tweet) {
 	// @todo: validate tweets with regex patterns
-	// @todo: reply to tweet thread and dm author
 	tweetThread := []*twitter.Tweet{}
 	count++
 	fmt.Println(tweet.Text)
 
+	// get all the parent tweets in the thread recusively
 	tweetThread, err := getTweetThread(tweet.ID, tweetThread)
 
 	if err != nil {
@@ -130,7 +135,7 @@ func handleTweet(tweet *twitter.Tweet) {
 		log.Println("\n Thread size: ", len(tweetThread))
 	}
 
-	// create digest for tweet thread and timestamp it
+	// create the digest from the tweet thread
 	b, err := json.Marshal(tweetThread)
 	digest := piutil.Digest(b)
 	var digests []*[sha256.Size]byte
@@ -138,6 +143,7 @@ func handleTweet(tweet *twitter.Tweet) {
 	copy(d[:], digest[:sha256.Size])
 	digests = append(digests, &d)
 
+	// timestamp the digests using dcrtime
 	err = piutil.Timestamp("test", getDcrtimeHost(), digests)
 	if err != nil {
 		log.Println("Could not timestamp", err)
@@ -153,18 +159,19 @@ func handleTweet(tweet *twitter.Tweet) {
 		log.Println("ipfs OK", cid)
 	}
 
+	// combine the results and send it through the results channel
 	tr := tweetResult{
 		Cid:    cid,
 		Digest: hex.EncodeToString(digest[:]),
 		Tweet:  tweet,
 	}
-
 	resultsChan <- tr
 
 	log.Println("\n \n ======", count, " TWEETS ======= \n ")
 }
 
 func handleTweetResult(tweetRes tweetResult) {
+	// reply to tweet thread with the timestmap and ipfs results
 	opt := &twitter.StatusUpdateParams{
 		InReplyToStatusID: tweetRes.Tweet.ID,
 	}
@@ -211,6 +218,8 @@ func main() {
 
 	log.Println(len(config.TargetWords), " tracked words: ", config.TargetWords)
 	log.Println("Start of the day!")
+
+	startServer()
 
 	// listen to stop signal and stop the stream before exiting
 	ch := make(chan os.Signal)

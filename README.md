@@ -1,4 +1,4 @@
-# Gostampbot
+# dcrtweetbot
 
 Timestamp tweets data into the Decred blockchain and save it to IPFS
 
