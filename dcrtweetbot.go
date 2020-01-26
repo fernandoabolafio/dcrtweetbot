@@ -171,6 +171,9 @@ func handleTweet(tweet *twitter.Tweet) {
 }
 
 func handleTweetResult(tweetRes tweetResult) {
+	if !config.EnableReplies {
+		return
+	}
 	// reply to tweet thread with the timestmap and ipfs results
 	opt := &twitter.StatusUpdateParams{
 		InReplyToStatusID: tweetRes.Tweet.ID,
