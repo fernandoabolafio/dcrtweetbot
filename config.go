@@ -18,11 +18,12 @@ const (
 var (
 	defaultHomeDir = dcrutil.AppDataDir("dcrtweetbot", false)
 
-	defaultConfigFile  = filepath.Join(defaultHomeDir, defaultConfigFilename)
-	defaultTargetWords = []string{}
-	defaultIPFSHost    = "localhost:5001"
-	defaultDcrtimeHost = v1.DefaultMainnetTimeHost
-	defaultDcrtimePort = v1.DefaultMainnetTimePort
+	defaultConfigFile    = filepath.Join(defaultHomeDir, defaultConfigFilename)
+	defaultTargetWords   = []string{}
+	defaultIPFSHost      = "localhost:5001"
+	defaultDcrtimeHost   = v1.DefaultMainnetTimeHost
+	defaultDcrtimePort   = v1.DefaultMainnetTimePort
+	defaultEnableReplies = false
 
 	usageMessage string
 )
@@ -35,6 +36,7 @@ type Config struct {
 	TwitAPITokenSecret    string   `long:"twitterapitokensecret" description:"Token secret for Twitter API (required)"`
 	TargetWords           []string `short:"t" long:"targetwords" description:"The target words to track"`
 	ConfigFile            string   `short:"c" long:"config" description:"The configuration file to be used"`
+	EnableReplies         bool     `short:"r" long:"enablereplies" description:"Send replies via Twitter API"`
 	IPFSHost              string   `long:"ipfshost" description:"The IPFS API host"`
 	DcrTimeHost           string   `long:"dcrtimehost" description:"The dcrtime API host"`
 	DcrTimePort           string   `long:"dcrtimeport" description:"The dcrtime API port"`
@@ -81,11 +83,12 @@ func loadConfig() *Config {
 	setUsageMessage()
 
 	config := &Config{
-		ConfigFile:  defaultConfigFile,
-		TargetWords: defaultTargetWords,
-		IPFSHost:    defaultIPFSHost,
-		DcrTimeHost: defaultDcrtimeHost,
-		DcrTimePort: defaultDcrtimePort,
+		ConfigFile:    defaultConfigFile,
+		TargetWords:   defaultTargetWords,
+		IPFSHost:      defaultIPFSHost,
+		DcrTimeHost:   defaultDcrtimeHost,
+		DcrTimePort:   defaultDcrtimePort,
+		EnableReplies: defaultEnableReplies,
 	}
 
 	// parse command line options to check for a different config file location
