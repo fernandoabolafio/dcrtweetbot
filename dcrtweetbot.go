@@ -167,16 +167,20 @@ func handleTweet(tweet *twitter.Tweet) {
 		Digest: hex.EncodeToString(digest[:]),
 		Tweet:  tweet,
 	}
+	cacheTweetResult(count, tr)
+	count++
+	resultsChan <- tr
+
+	log.Println("\n \n ======", count, " TWEETS ======= \n ")
+}
+
+func cacheTweetResult(count int, tr tweetResult) {
 	if count < numberOfTweetsVisible {
 		timestampedTweets[count] = tr
 	} else {
 		timestampedTweets = timestampedTweets[1:]
 		timestampedTweets = append(timestampedTweets, tr)
 	}
-	count++
-	resultsChan <- tr
-
-	log.Println("\n \n ======", count, " TWEETS ======= \n ")
 }
 
 func handleTweetResult(tweetRes tweetResult) {
