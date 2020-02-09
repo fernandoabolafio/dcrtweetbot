@@ -22,6 +22,8 @@ var shell *ipfs.Shell
 var client *twitter.Client
 var config *Config
 var dcrtimeHost string
+var timestampedTweets = make([]tweetResult, 10)
+var numberOfTweetsVisible = 10
 var count int
 
 type tweetResult struct {
@@ -123,7 +125,6 @@ func getDcrtimeHost() string {
 func handleTweet(tweet *twitter.Tweet) {
 	// @todo: validate tweets with regex patterns
 	tweetThread := []*twitter.Tweet{}
-	count++
 	fmt.Println(tweet.Text)
 
 	// get all the parent tweets in the thread recusively
@@ -165,6 +166,13 @@ func handleTweet(tweet *twitter.Tweet) {
 		Digest: hex.EncodeToString(digest[:]),
 		Tweet:  tweet,
 	}
+	if count < numberOfTweetsVisible {
+		timestampedTweets[count] = tr
+	} else {
+		timestampedTweets = timestampedTweets[1:]
+		timestampedTweets = append(timestampedTweets, tr)
+	}
+	count++
 	resultsChan <- tr
 
 	log.Println("\n \n ======", count, " TWEETS ======= \n ")
