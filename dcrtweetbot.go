@@ -18,12 +18,13 @@ import (
 	ipfs "github.com/ipfs/go-ipfs-api"
 )
 
+const numberOfTweetsVisible = 100
+
 var shell *ipfs.Shell
 var client *twitter.Client
 var config *Config
 var dcrtimeHost string
 var timestampedTweets = make([]tweetResult, 100)
-var numberOfTweetsVisible = 100
 var count int
 
 type tweetResult struct {
