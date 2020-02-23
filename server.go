@@ -64,9 +64,6 @@ func startServer() {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./public/css"))))
 	http.HandleFunc("/stream", streamTweets)
 	http.HandleFunc("/", home)
-	err := http.ListenAndServe(*addr, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Server is running on port 3000")
+	log.Println("Starting server on port 3000")
+	log.Fatal(http.ListenAndServe(*addr, nil))
 }
