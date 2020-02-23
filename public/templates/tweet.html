@@ -1,5 +1,12 @@
 {{ define "tweet" }}
-<div>
-  {{ .Cid }}
-</div>
-{{ end }}
+  {{$tweet := .}}
+  <div class="tweet-container">
+    <p class="red-class">
+      {{ $tweet.TweetText }}
+    </p>
+    <div>
+      <span>{{ $tweet.Cid }}</span>
+      <span>{{ $tweet.Digest }}</span>
+    </div>
+  </div>
+{{end}}

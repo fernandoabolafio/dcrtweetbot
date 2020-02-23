@@ -7,9 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/thedevsaddam/renderer"
-
 	"github.com/gorilla/websocket"
+	"github.com/thedevsaddam/renderer"
 )
 
 var addr = flag.String("addr", "localhost:3000", "http service address")
@@ -22,11 +21,11 @@ var homeTemplate = template.Must(template.ParseFiles("./public/home.html"))
 var rnd *renderer.Render
 
 type wsConfig struct {
-	WsHost string
+	WsHost        string
+	StampedTweets []displayTweet
 }
 
-//TODO: this method needs an appropriate naming
-func echo(w http.ResponseWriter, r *http.Request) {
+func streamTweets(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
@@ -49,14 +48,13 @@ func echo(w http.ResponseWriter, r *http.Request) {
 
 func home(w http.ResponseWriter, r *http.Request) {
 	wscfg := wsConfig{
-		WsHost: "ws://" + r.Host + "/echo",
+		WsHost:        "ws://" + r.Host + "/stream",
+		StampedTweets: timestampedTweets,
 	}
 	rnd.HTML(w, http.StatusOK, "home", wscfg)
-	// homeTemplate.Execute(w, "ws://"+r.Host+"/echo")
 }
 
 func startServer() {
-
 	opts := renderer.Options{
 		ParseGlobPattern: "./public/*.html",
 	}
@@ -64,7 +62,11 @@ func startServer() {
 	rnd = renderer.New(opts)
 
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./public/css"))))
-	http.HandleFunc("/echo", echo)
+	http.HandleFunc("/stream", streamTweets)
 	http.HandleFunc("/", home)
-	log.Fatal(http.ListenAndServe(*addr, nil))
+	err := http.ListenAndServe(*addr, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Server is running on port 3000")
 }

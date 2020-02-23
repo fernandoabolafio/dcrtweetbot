@@ -24,8 +24,14 @@ var shell *ipfs.Shell
 var client *twitter.Client
 var config *Config
 var dcrtimeHost string
-var timestampedTweets = make([]tweetResult, 100)
+var timestampedTweets = make([]displayTweet, 100)
 var count int
+
+type displayTweet struct {
+	Cid       string
+	Digest    string
+	TweetText string
+}
 
 type tweetResult struct {
 	Cid    string
@@ -175,11 +181,16 @@ func handleTweet(tweet *twitter.Tweet) {
 }
 
 func cacheTweetResult(count int, tr tweetResult) {
+	displayTweet := displayTweet{
+		Cid:       tr.Cid,
+		Digest:    tr.Digest,
+		TweetText: tr.Tweet.Text,
+	}
 	if count < numberOfTweetsVisible {
-		timestampedTweets[count] = tr
+		timestampedTweets[count] = displayTweet
 	} else {
 		timestampedTweets = timestampedTweets[1:]
-		timestampedTweets = append(timestampedTweets, tr)
+		timestampedTweets = append(timestampedTweets, displayTweet)
 	}
 }
 

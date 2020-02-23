@@ -8,53 +8,39 @@
         var output = document.getElementById("output");
         var input = document.getElementById("input");
         var ws;
-        var print = function(message) {
+        ws = new WebSocket("{{ .WsHost }}");
+        ws.onopen = function(evt) {
+          console.log("OPEN");
+        };
+        ws.onclose = function(evt) {
+          console.log("CLOSE");
+          ws = null;
+        };
+        ws.onmessage = function(evt) {
+          printTweet(evt.data);
+        };
+        ws.onerror = function(evt) {
+          console.log("ERROR: " + evt.data);
+        };
+        var printTweet = function(message) {
           console.log(message);
-          var d = document.createElement("div");
-          //   d.innerHTML = message;
+          var container = document.createElement("div");
+          var ids = document.createElement("div");
           const data = JSON.parse(message);
-          const text = document.createElement("p");
-          text.classList.add("red-class");
+          const tweetText = document.createElement("p");
+          tweetText.classList.add("red-class");
+          tweetText.innerHTML = data.Tweet.text;
+          container.appendChild(tweetText);
           const cid = document.createElement("span");
           const dig = document.createElement("span");
-          console.log(data);
-          text.innerHTML = data.Tweet.text;
-          d.appendChild(text);
           cid.innerHTML = data.Cid;
           dig.innerHTML = data.Digest;
+          ids.appendChild(cid);
+          ids.appendChild(dig);
+          container.appendChild(ids);
 
-          output.appendChild(d);
-          output.appendChild(cid);
-          output.appendChild(dig);
-        };
-        document.getElementById("open").onclick = function(evt) {
-          evt.preventDefault();
-          if (ws) {
-            return false;
-          }
-          ws = new WebSocket("{{ .WsHost }}");
-          ws.onopen = function(evt) {
-            console.log("OPEN");
-          };
-          ws.onclose = function(evt) {
-            console.log("CLOSE");
-            ws = null;
-          };
-          ws.onmessage = function(evt) {
-            print(evt.data);
-          };
-          ws.onerror = function(evt) {
-            console.log("ERROR: " + evt.data);
-          };
-          return false;
-        };
-        document.getElementById("send").onclick = function(evt) {
-          if (!ws) {
-            return false;
-          }
-          print("SEND: " + input.value);
-          ws.send(input.value);
-          return false;
+          output.appendChild(container);
+          
         };
         document.getElementById("close").onclick = function(evt) {
           if (!ws) {
@@ -69,31 +55,12 @@
   </head>
   <body>
     {{ template "header" }}
-    <div class="red-class">test</div>
-    <table>
-      <tr>
-        <td valign="top" width="50%">
-          <p>
-            Click "Open" to create a connection to the server, "Send" to send a
-            message to the server and "Close" to close the connection. You can
-            change the message and send multiple times.
-          </p>
-
-          <p></p>
-          <form>
-            <button id="open">Open</button>
-            <button id="close">Close</button>
-            <p>
-              <input id="input" type="text" value="Hello world!" />
-              <button id="send">Send</button>
-            </p>
-          </form>
-        </td>
-        <td valign="top" width="50%">
-          <div id="output"></div>
-        </td>
-      </tr>
-    </table>
+    <button id="close">Close</button>
+    <div id="output">
+      {{range .StampedTweets}}
+        {{ template "tweet" .}}
+      {{end}}
+    </div>
   </body>
 </html>
 {{ end }}
