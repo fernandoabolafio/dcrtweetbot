@@ -20,9 +20,9 @@ var homeTemplate = template.Must(template.ParseFiles("./public/home.html"))
 
 var rnd *renderer.Render
 
-type wsConfig struct {
+type homePageConfig struct {
 	WsHost        string
-	StampedTweets []displayTweet
+	StampedTweets []tweetResult
 }
 
 func streamTweets(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +47,7 @@ func streamTweets(w http.ResponseWriter, r *http.Request) {
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-	wscfg := wsConfig{
+	wscfg := homePageConfig{
 		WsHost:        "ws://" + r.Host + "/stream",
 		StampedTweets: timestampedTweets,
 	}

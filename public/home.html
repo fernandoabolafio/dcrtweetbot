@@ -28,7 +28,7 @@
           const data = JSON.parse(message);
           const tweetText = document.createElement("p");
           tweetText.classList.add("red-class");
-          tweetText.innerHTML = data.Tweet.text;
+          tweetText.innerHTML = data.Tweet.Text;
           container.appendChild(tweetText);
           const cid = document.createElement("span");
           const dig = document.createElement("span");
@@ -56,7 +56,7 @@
     {{ template "header" }}
     <button id="close">Close</button>
     <div id="output">
-      {{range .StampedTweets}}
+      {{range .timestampedTweets }}
         {{ template "tweet" .}}
       {{end}}
     </div>

@@ -24,19 +24,21 @@ var shell *ipfs.Shell
 var client *twitter.Client
 var config *Config
 var dcrtimeHost string
-var timestampedTweets = make([]displayTweet, 100)
+var timestampedTweets = make([]tweetResult, 100)
 var count int
 
 type displayTweet struct {
-	Cid       string
-	Digest    string
-	TweetText string
+	ID       int64
+	Text     string
+	UserName string
 }
 
 type tweetResult struct {
-	Cid    string
-	Digest string
-	Tweet  *twitter.Tweet
+	Cid     string
+	Digest  string
+	isReply bool
+	Tweet   displayTweet
+	Thread  []displayTweet
 }
 
 var resultsChan chan tweetResult
@@ -132,7 +134,7 @@ func getDcrtimeHost() string {
 func handleTweet(tweet *twitter.Tweet) {
 	// @todo: validate tweets with regex patterns
 	tweetThread := []*twitter.Tweet{}
-	fmt.Println(tweet.Text)
+	var displayThread []displayTweet
 
 	// get all the parent tweets in the thread recusively
 	tweetThread, err := getTweetThread(tweet.ID, tweetThread)
@@ -166,12 +168,28 @@ func handleTweet(tweet *twitter.Tweet) {
 	} else {
 		log.Println("ipfs OK", cid)
 	}
-
+	isReply := len(tweetThread) > 0
+	if isReply {
+		displayThread := make([]displayTweet, len(tweetThread))
+		for i, reply := range tweetThread {
+			displayThread[i] = displayTweet{
+				ID:       reply.ID,
+				Text:     reply.Text,
+				UserName: reply.User.ScreenName,
+			}
+		}
+	}
 	// combine the results and send it through the results channel
 	tr := tweetResult{
 		Cid:    cid,
 		Digest: hex.EncodeToString(digest[:]),
-		Tweet:  tweet,
+		Tweet: displayTweet{
+			ID:       tweet.ID,
+			Text:     tweet.Text,
+			UserName: tweet.User.ScreenName,
+		},
+		isReply: isReply,
+		Thread:  displayThread,
 	}
 	cacheTweetResult(count, tr)
 	count++
@@ -181,16 +199,11 @@ func handleTweet(tweet *twitter.Tweet) {
 }
 
 func cacheTweetResult(count int, tr tweetResult) {
-	displayTweet := displayTweet{
-		Cid:       tr.Cid,
-		Digest:    tr.Digest,
-		TweetText: tr.Tweet.Text,
-	}
 	if count < numberOfTweetsVisible {
-		timestampedTweets[count] = displayTweet
+		timestampedTweets[count] = tr
 	} else {
 		timestampedTweets = timestampedTweets[1:]
-		timestampedTweets = append(timestampedTweets, displayTweet)
+		timestampedTweets = append(timestampedTweets, tr)
 	}
 }
 
