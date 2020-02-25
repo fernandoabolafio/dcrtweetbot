@@ -47,11 +47,11 @@ func streamTweets(w http.ResponseWriter, r *http.Request) {
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-	wscfg := homePageConfig{
+	hpcfg := homePageConfig{
 		WsHost:        "ws://" + r.Host + "/stream",
 		StampedTweets: timestampedTweets,
 	}
-	rnd.HTML(w, http.StatusOK, "home", wscfg)
+	rnd.HTML(w, http.StatusOK, "home", hpcfg)
 }
 
 func startServer() {
