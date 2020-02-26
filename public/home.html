@@ -56,7 +56,7 @@
     {{ template "header" }}
     <button id="close">Close</button>
     <div id="output">
-      {{range .timestampedTweets }}
+      {{range .StampedTweets }}
         {{ template "tweet" .}}
       {{end}}
     </div>
