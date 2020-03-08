@@ -1,17 +1,77 @@
-/* tweet */
-
-.tweet-container {
+/* home */
+#output {
+  max-width: 1002px;
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  background-color: #dedede;
+  border: 1px solid #4d4d4d;
 }
 
-.tweet-body {
+.latestHeader {
+  background-color: #fff;
+  padding: 20px;
+}
+
+/* tweet */
+.tweetBody {
   padding: 20px;
   background-color: #cfd7f8;
 }
 
-/* home */
-#output {
-    max-width: 1002px;
-    width: 100%;
-    margin-right: auto;
-    margin-left: auto;
+.tweetFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+.tweetIds {
+  flex: 0 0 70%;
+  display: flex;
+}
+
+.tweetId {
+  flex: 0 0 auto;
+  display: flex;
+  margin-right: 10px;
+}
+
+.tweetIdLink {
+  white-space: nowrap;
+  width: 210px; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* header */
+.headerContainer {
+  height: 80px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.headerGhIcon {
+  flex: 0 0 10%;
+  display: flex;
+  justify-content: end;
+}
+
+svg {
+  height: 37px;
+}
+
+.headerText {
+  flex: 1 0 auto;
+}
+
+
+/* global */
+p {
+  margin: 0;
+}
+
+h1, h2 {
+  margin: 0;
 }

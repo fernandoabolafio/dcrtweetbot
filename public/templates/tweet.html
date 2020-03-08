@@ -1,14 +1,23 @@
 {{ define "tweet" }}
-  {{ $tweet := . }}
-  {{ if $tweet }}
-    <div class="tweet-container">
-      <p class="tweet-body">
-        {{ $tweet.Tweet.Text }}
-      </p>
-      <div class="tweet-ids">
-        <span>{{ $tweet.Cid }}</span>
-        <span>{{ $tweet.Digest }}</span>
-      </div>
+{{ $tweet := . }}
+<div>
+  <p class="tweetBody">
+    {{ $tweet.Tweet.Text }}
+  </p>
+  <div class="tweetFooter">
+    <div class="tweetIds">
+      <span class="tweetId">
+        IPFS: <a class="tweetIdLink" href="#">{{ $tweet.Cid }}</a>
+      </span>
+      <span class="tweetId">
+        DCRtime digest: <a class="tweetIdLink" href="#">{{ $tweet.Digest }}</a>
+      </span>
     </div>
-  {{ end}}
+    <div class="tweetShowReplies">
+      <a href="#">
+        show full thread
+      </a>
+    </div>
+  </div>
+</div>
 {{end}}

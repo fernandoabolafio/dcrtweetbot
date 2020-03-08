@@ -14,7 +14,7 @@
     </script>
     {{ template "header" }}
     <div id="output">
-      <h2>Latest timestamped tweets</h2>
+      <h2 class="latestHeader">Latest timestamped tweets</h2>
       {{range .StampedTweets }}
           {{ template "tweet" .}}
       {{end}}

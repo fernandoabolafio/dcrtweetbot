@@ -1,6 +1,5 @@
 const initWebsocket = (wsObj) => {
   const ws = new WebSocket(wsObj);
-  const output = document.getElementById("output");
   ws.onmessage = (evt) => {
     printTweet(evt.data);
   };
@@ -28,6 +27,7 @@ const initWebsocket = (wsObj) => {
     ids.appendChild(dig);
     container.appendChild(ids);
 
+    const output = document.getElementById("output");
     output.appendChild(container);
   }
 };
