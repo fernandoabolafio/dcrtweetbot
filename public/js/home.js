@@ -1,20 +1,16 @@
-
-var ws;
-function initWebsocket(wsObj) {
-  ws = new WebSocket(wsObj);
-  var output = document.getElementById("output");
-  console.log(output);
-  console.log(ws);
-  ws.onmessage = function (evt) {
+const initWebsocket = (wsObj) => {
+  const ws = new WebSocket(wsObj);
+  const output = document.getElementById("output");
+  ws.onmessage = (evt) => {
     printTweet(evt.data);
   };
-  ws.onerror = function (evt) {
+  ws.onerror = (evt) => {
     console.log("ERROR: " + evt.data);
   };
-  var printTweet = function (message) {
+  const printTweet = (message) => {
     const data = JSON.parse(message);
 
-    var container = document.createElement("tweet-container");
+    const container = document.createElement("tweet-container");
     
     // tweet body
     const tweetText = document.createElement("p");
