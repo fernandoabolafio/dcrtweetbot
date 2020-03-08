@@ -3,15 +3,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <script type="text/javascript" src="/js/home.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
   </head>
   <body>
+    <script type="text/javascript" src="/js/home.js"></script>
+    <script type="text/javascript">
+      window.addEventListener("load", function(evt) {
+        initWebsocket("{{ .WsHost }}")
+      });
+    </script>
     {{ template "header" }}
-    <button id="close">Close</button>
     <div id="output">
+      <h2>Latest timestamped tweets</h2>
       {{range .StampedTweets }}
-        {{ template "tweet" .}}
+          {{ template "tweet" .}}
       {{end}}
     </div>
   </body>

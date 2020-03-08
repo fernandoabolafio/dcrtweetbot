@@ -1,29 +1,29 @@
-window.addEventListener("load", function(evt) {
+
+var ws;
+function initWebsocket(wsObj) {
+  ws = new WebSocket(wsObj);
   var output = document.getElementById("output");
-  var input = document.getElementById("input");
-  var ws;
-  ws = new WebSocket("{{ .WsHost }}");
-  ws.onopen = function(evt) {
-    console.log("OPEN");
-  };
-  ws.onclose = function(evt) {
-    console.log("CLOSE");
-    ws = null;
-  };
-  ws.onmessage = function(evt) {
+  console.log(output);
+  console.log(ws);
+  ws.onmessage = function (evt) {
     printTweet(evt.data);
   };
-  ws.onerror = function(evt) {
+  ws.onerror = function (evt) {
     console.log("ERROR: " + evt.data);
   };
-  var printTweet = function(message) {
-    var container = document.createElement("div");
-    var ids = document.createElement("div");
+  var printTweet = function (message) {
     const data = JSON.parse(message);
+
+    var container = document.createElement("tweet-container");
+    
+    // tweet body
     const tweetText = document.createElement("p");
-    tweetText.classList.add("red-class");
+    tweetText.classList.add("tweet-body");
     tweetText.innerHTML = data.Tweet.Text;
     container.appendChild(tweetText);
+
+    // ids
+    const ids = document.createElement("tweet-ids");
     const cid = document.createElement("span");
     const dig = document.createElement("span");
     cid.innerHTML = data.Cid;
@@ -33,13 +33,5 @@ window.addEventListener("load", function(evt) {
     container.appendChild(ids);
 
     output.appendChild(container);
-    
-  };
-  document.getElementById("close").onclick = function(evt) {
-    if (!ws) {
-      return false;
-    }
-    ws.close();
-    return false;
-  };
-});
+  }
+};

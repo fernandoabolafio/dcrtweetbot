@@ -1,3 +1,17 @@
-.red-class {
-  color: red;
+/* tweet */
+
+.tweet-container {
+}
+
+.tweet-body {
+  padding: 20px;
+  background-color: #cfd7f8;
+}
+
+/* home */
+#output {
+    max-width: 1002px;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
 }
