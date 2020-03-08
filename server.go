@@ -62,6 +62,7 @@ func startServer() {
 	rnd = renderer.New(opts)
 
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./public/css"))))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./public/js"))))
 	http.HandleFunc("/stream", streamTweets)
 	http.HandleFunc("/", home)
 	log.Println("Starting server on port 3000")
